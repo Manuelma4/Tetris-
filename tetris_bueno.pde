@@ -1,27 +1,20 @@
-/Arreglo para las figuras
-int[][] Cuadrado = {{0,0}, {1,0}, {0,1}, {1,1}};
-int[][] Linea = {{0,0}, {1,0}, {2,0}, {3,0}};
-int[][] Triangulo = {{0,0}, {1,0}, {2,0}, {1,1}};
-int[][] Tetrominillo_Derecha = {{0,0}, {1,0}, {2,0}, {2,1}};
-int[][] Tetrominillo_Izquierda = {{0,0}, {1,0}, {2,0}, {0,1}};
-int[][] Figura_Culebrillaxd = {{0,0}, {1,0}, {1,1}, {2,1}};
-int[][] Figura_Culebrilla2xd = {{0,1}, {1,0}, {1,1}, {2,0}};
-boolean Activo, Pasa_Izquierda, Pasa_derecha; 
-int Escoger, contadorRotaciones;
-int Nivel;
+void setup(){
+  size(600 , 600);
+  figura = new Figura();
+  figura.Activo = true;
+  Figura_presente = new Figura();
+  Fd = new Fondito();
+  textSize(44);
+  Estado_Juego = 1;
+}
+Figura figura, Figura_presente;
+Fondito Fd;
 int Estado_Juego;
 int[][][] colores;
 int r,g,b;
 int w;
 int ejeX, ejeY;
 int puntaje;
-void setup(){
-  size(600 , 600);
-  textSize(44);
-  Estado_Juego = 1;
-}
-Figura figura, Figura_presente;
-Fondito Fd;
 void dibujarGrilla(){
   strokeWeight(2);
     stroke(155);
@@ -217,7 +210,7 @@ class Figura{
   void Abajo(){
      Comprobacion();
      if(contador % Nivel == 0){
-       C_Mueve("DOWN");
+       Mueve("DOWN");
      }
      contador++;
   }
@@ -250,7 +243,7 @@ class Figura{
       return true;
   }
 
-  void C_Mueve(String direccion){
+  void Mueve(String direccion){
     if(ComprobarSitio(direccion)){
        switch(direccion){
          case "LEFT":
@@ -357,15 +350,11 @@ void Puntaje_Nivel(){
    if(Fd.puntaje >= 10){
      textSize(44);
      fill(264,0,0);
-     text("Sigue asi UwU", width/2 + 2, 320);}
+     text("Tu puedes UwU", width/2 + 2, 320);}
    else{
      textSize(30);
      fill(264,0,0);
-     text("Tu puedes UwU", width/2+2, 320);
-   if(Fd.puntaje >=30){
-     fill(0,264,0);
-     text("JP severo teacher", width/2 + 2, 320);
-   }
+     text("Sigue asi UwU", width/2+2, 320);
    }
    }
 }
@@ -387,11 +376,11 @@ void drawFigura(){
 }
 void keyPressed(){
   if(keyCode == RIGHT){
-    figura.C_Mueve("RIGHT");
+    figura.Mueve("RIGHT");
   } else if (keyCode == LEFT){
-    figura.C_Mueve("LEFT");
+    figura.Mueve("LEFT");
   } else if (keyCode == DOWN){
-    figura.C_Mueve("DOWN");
+    figura.Mueve("DOWN");
   }
 }
 
