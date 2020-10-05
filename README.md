@@ -7,15 +7,15 @@ Todas las sugerencias seran bien recibidas.
 -IDE de processing.
 -Java 7 o superior.
 
-##Como ejecutar
+## Como ejecutar
 
 Para ejecutar el juego tienes que copiar el codigo en Processing y estar con la version integrada de java.
 
-##Instrucciones
+## Instrucciones
 
 Cuando ejecutes el programa, el juego inicia en el mismo momento, tienes que dar clic en la pestaña del juego y podras iniciar a disfrutar.
 
-##Controles del juego
+## Controles del juego
 
 -Bajar mas rapido: Cruzeta-abajo.
 -Movimiento hacia la izquierda: Cruzeta-izquierda.
