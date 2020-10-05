@@ -1,99 +1,134 @@
-public class Grid{
-
-  private int w;
-  
-  public Grid(){
-      w = width / 24;
-  }
-    
-  public void display(){
-    strokeWeight(2);
-    stroke(155);
-    for(int i = 0; i < 13; i++){
-        line(0,w*i, width/2, w*i);
-        line(0,w*(i+12), width/2, w*(i+12));
-        line(w*i, 0, w*i, height);
-    }
-  }
-  
+/Arreglo para las figuras
+int[][] Cuadrado = {{0,0}, {1,0}, {0,1}, {1,1}};
+int[][] Linea = {{0,0}, {1,0}, {2,0}, {3,0}};
+int[][] Triangulo = {{0,0}, {1,0}, {2,0}, {1,1}};
+int[][] Tetrominillo_Derecha = {{0,0}, {1,0}, {2,0}, {2,1}};
+int[][] Tetrominillo_Izquierda = {{0,0}, {1,0}, {2,0}, {0,1}};
+int[][] Figura_Culebrillaxd = {{0,0}, {1,0}, {1,1}, {2,1}};
+int[][] Figura_Culebrilla2xd = {{0,1}, {1,0}, {1,1}, {2,0}};
+boolean Activo, Pasa_Izquierda, Pasa_derecha; 
+int Escoger, contadorRotaciones;
+int Nivel;
+int Estado_Juego;
+int[][][] colores;
+int r,g,b;
+int w;
+int ejeX, ejeY;
+int puntaje;
+void setup(){
+  size(600 , 600);
+  textSize(44);
+  Estado_Juego = 1;
 }
-
-public class Background{
-
-     private int[][][] colors;
-     private int r,g,b;
-     private int w;
-     private int theX, theY;
-     private int score;
+Figura figura, Figura_presente;
+Fondito Fd;
+void dibujarGrilla(){
+  strokeWeight(2);
+    stroke(155);
+    int w;
+    w = width / 24;
+    for(int i = 0; i < 13; i++){
+      line(0,w*i, width/2, w*i);
+      line(0,w*(i+12), width/2, w*(i+12));
+      line(w*i, 0, w*i, height);
+    }
+}
+void draw(){
+  dibujarGrilla();
+   if(Estado_Juego == 1){
+     Fd.pantalla();
+     drawFigura();
+     Puntaje_Nivel();
+     if(!Fd.Inicio()){
+       Estado_Juego = 2;
+       
+     }
+   }
+   if(Estado_Juego == 2){
+     fill(0);
+     text("  Presiona clic  ", 30, height/3);
+     text("para jugar de nuevo", 30, height/2);
+     fill(255);
+     text("  Presiona clic ", 32, height/3+2);
+     text("para jugar de nuevo", 32, height/2+2);
+     if(mousePressed){
+       setup();
+     }
+   }
      
-  public Background(){
-      colors = new int[12][24][3];
+}
+class Fondito{
+
+     int[][][] colores;
+     int r,g,b;
+     int w;
+     int ejeX, ejeY;
+     int puntaje;
+     
+  Fondito(){
+      colores = new int[12][24][3];
       w = width / 24;
   }
   
-  //describe el metodo para dibujar un rectangulo para cada "x" y "y" usando el sistemas de colores RGB the colors RGB
-  public void pantalla(){
+  //describe el metodo para dibujar un cuadrado para cada "x" y "y" usando el sistemas de colores RGB
+  void pantalla(){
       for(int i = 0; i < 12; i++){
         for(int j = 0; j < 24; j++){
-          r = colors[i][j][0];
-          g = colors[i][j][1];
-          b = colors[i][j][2];
+          r = colores[i][j][0];
+          g = colores[i][j][1];
+          b = colores[i][j][2];
           fill(r,g,b);
           rect(i*w, j*w, w, w);
         }
       }
       for(int i = 0; i < 24; i++){
-        if(checkLine(i)){
-          removeLine(i);
+        if(Ok_Linea(i)){
+          Quitar_Fila(i);
         }
       }
   }
   
-  void writeShape(Shape s){
-       //get theX and theY of each block
+  void RealizarFigura(Figura s){
+       //Obtiene theX y theY de cada bloque
        for(int i = 0; i < 4; i++){
-         theX = s.theShape[i][0];
-         theY = s.theShape[i][1];
-         //Write the colors of the shape into these x,y valuees
-         colors[theX][theY][0] = s.r;
-         colors[theX][theY][1] = s.g;
-         colors[theX][theY][2] = s.b;
+         ejeX = s.LaFigura[i][0];
+         ejeY = s.LaFigura[i][1];
+         //Imprime lcontadorRotaciones colores de la figura dentro de valores de x,y
+         colores[ejeX][ejeY][0] = s.r;
+         colores[ejeX][ejeY][1] = s.g;
+         colores[ejeX][ejeY][2] = s.b;
        }       
    }
-   
-   //Check for a complete line (boolean)
-   public boolean checkLine(int row){
+   boolean Ok_Linea(int fila){
      for(int i = 0; i < 12; i++){
-       if(colors[i][row][0] == 0 && colors[i][row][1] == 0 && colors[i][row][2] == 0){
+       if(colores[i][fila][0] == 0 && colores[i][fila][1] == 0 && colores[i][fila][2] == 0){
          return false;
        }
      }  
      return true;
    }
-
-   //Remove Lines (if full)
-   void removeLine(int row){
-     score++;
-     int[][][] newBackground = new int[12][24][3];
+   void Quitar_Fila(int fila){
+     puntaje++;
+     int[][][] nuevoFondito = new int[12][24][3];
      for(int i = 0; i < 12; i++){
-       for(int j = 23; j > row; j--){
+       for(int j = 23; j > fila; j--){
          for(int a = 0; a < 3; a++){
-           newBackground[i][j][a] = colors[i][j][a];
+           nuevoFondito[i][j][a] = colores[i][j][a];
          }
        }    
      }
-     for(int r = row; r >= 1; r--){
+     for(int r = fila; r >= 1; r--){
        for(int j = 0; j < 12; j++){
-         newBackground[j][r][0] = colors[j][r-1][0];
-         newBackground[j][r][1] = colors[j][r-1][1];
-         newBackground[j][r][2] = colors[j][r-1][2];
+         nuevoFondito[j][r][0] = colores[j][r-1][0];
+         nuevoFondito[j][r][1] = colores[j][r-1][1];
+         nuevoFondito[j][r][2] = colores[j][r-1][2];
        }
      }     
-     colors = newBackground;
+     colores = nuevoFondito;
    }
    
-   boolean gameOn(){
-     if(colors[0][0][0] != 0){
+   boolean Inicio(){
+     if(colores[0][0][0] != 0){
        return false;
      } else {
        return true;
@@ -102,111 +137,111 @@ public class Background{
    
 }  
 
-public class Shape{
+class Figura{
    
-  //7 Tetris Shapes
-  private int[][] square = {{0,0}, {1,0}, {0,1}, {1,1}};
-  private int[][] ln = {{0,0}, {1,0}, {2,0}, {3,0}};
-  private int[][] tri = {{0,0}, {1,0}, {2,0}, {1,1}};
-  private int[][] rightL = {{0,0}, {1,0}, {2,0}, {2,1}};
-  private int[][] leftL = {{0,0}, {1,0}, {2,0}, {0,1}};
-  private int[][] theS = {{0,0}, {1,0}, {1,1}, {2,1}};
-  private int[][] otherS = {{0,1}, {1,0}, {1,1}, {2,0}};
+  //7 Tetris Forma
+  int[][] Cuadrado = {{0,0}, {1,0}, {0,1}, {1,1}};
+  int[][] Linea = {{0,0}, {1,0}, {2,0}, {3,0}};
+  int[][] Triangulo = {{0,0}, {1,0}, {2,0}, {1,1}};
+  int[][] Tetrominillo_Derecha = {{0,0}, {1,0}, {2,0}, {2,1}};
+  int[][] Tetrominillo_Izquierda = {{0,0}, {1,0}, {2,0}, {0,1}};
+  int[][] Figura_Culebrillaxd = {{0,0}, {1,0}, {1,1}, {2,1}};
+  int[][] Figura_Culebrilla2xd = {{0,1}, {1,0}, {1,1}, {2,0}};
+  int[][] LaFigura, OtraFigura;   //Figura original
+  boolean Activo, Pasa_Izquierda, Pasa_derecha;
+  int contador, r, g, b;
+  float w; 
+  int Escoger, contadorRotaciones;
+  int ejeX, ejeY;
+  int Nivel;
   
-  //other fields
-  private int[][] theShape, oS;   //Original Shape
-  private boolean isActive, isTooLeft, isTooRight;
-  private int counter, r, g, b;
-  private float w; //width of each block in the piece
-  private int choice, rotCount;
-  private int theX, theY;
-  private int level;
-  
-  public Shape(){
-    level = 31;
-    choice = (int)random(7);
+  public Figura(){
+    Nivel = 31;
+    Escoger = (int)random(7);
     w = width/24;
-    switch(choice){
-       case 0: theShape = square;
-               r = 255;
+    switch(Escoger){
+       case 0: LaFigura = Cuadrado;
+               g = 188;
                break;
-       case 1: theShape = ln;
-               g = 255;
+       case 1: LaFigura = Linea;
+               b = 200;
                break;      
-       case 2: theShape = tri;
-               b = 255;
-               break;
-       case 3: theShape = leftL;
+       case 2: LaFigura = Triangulo;
                r = 255;
-               g = 255;
+               break;
+       case 3: LaFigura = Tetrominillo_Izquierda;
+               b = 170;
+               g = 135;
                break;               
-       case 4: theShape = rightL;
+       case 4: LaFigura = Tetrominillo_Derecha;
                g = 255;
-               b = 255;
-               break;
-       case 5: theShape = theS;
                r = 255;
-               b = 255;
                break;
-       case 6: theShape = otherS;
-               r = 255;
+       case 5: LaFigura = Figura_Culebrillaxd;
+               r = 200;
+               b = 155;
+               break;
+       case 6: LaFigura = Figura_Culebrilla2xd;
+               b = 180;
                g = 255;
-               b = 255;
+               b = 60;
                break;               
     }
-    counter = 1;
-    oS = theShape;
-    rotCount = 0;
+    contador = 1;
+    OtraFigura = LaFigura;
+    contadorRotaciones = 0;
   }
   
   void pantalla(){
     fill(r,g,b);
     for(int i = 0; i < 4; i++){
-        rect(theShape[i][0]*w, theShape[i][1]*w, w, w);  
+        rect(LaFigura[i][0]*w, LaFigura[i][1]*w, w, w);  
     }
   }
   
-  void showOnDeck(){
-    fill(0,0,100);
+  void Mostrar_Figura_presente(){
+    fill(0,0,0);
     rect(width/2, 0, width/2, height);
     fill(0);
-    text("SIGUIENTE FIGURA:", width/2 + 10, 50);
+    text("SIGUIENTE", width/2 + 10, 50);
+    text("FIGURA:", width/2 + 10, 100);
     fill(255);
-    text("SIGUIENTE FIGURA:", width/2 + 15, 55);
+    text("SIGUIENTE ", width/2 + 15, 55);
+    text("FIGURA:", width/2 + 15, 105);
     fill(r,g,b);
     for(int i = 0; i < 4; i++){
-        rect(theShape[i][0]*w + width/4 *3 - 2*w, theShape[i][1]*w + 100, w, w);  
+        rect(LaFigura[i][0]*w + width/4 *3 - 2*w, LaFigura[i][1]*w + 150, w, w);  
     }
   }
   
-  void moveDown(){
-     checkEdges();
-     if(counter % level == 0){
-       move("DOWN");
+  void Abajo(){
+     Comprobacion();
+     if(contador % Nivel == 0){
+       C_Mueve("DOWN");
      }
-     counter++;
+     contador++;
   }
 
-  boolean checkSide(String side){     
-      switch(side){ 
+  boolean ComprobarSitio(String sitio){     
+      switch(sitio){ 
          case "LEFT":
            for(int i = 0; i < 4; i++){
-              if(theShape[i][0]<1){
+              if(LaFigura[i][0]<1){
                 return false;
               }
            }
            break;
          case "RIGHT":
            for(int i = 0; i < 4; i++){
-              if(theShape[i][0]>10){
+              if(LaFigura[i][0]>10){
                 return false;
               }
            }
            break;
          case "DOWN":
            for(int i = 0; i < 4; i++){
-              if(theShape[i][1]>22){
-                isActive = false;
+              if(LaFigura[i][1]>22){
+                Activo = false;
                 return false;
               }
            }
@@ -215,22 +250,22 @@ public class Shape{
       return true;
   }
 
-  void move(String dir){
-    if(checkSide(dir)){
-       switch(dir){
+  void C_Mueve(String direccion){
+    if(ComprobarSitio(direccion)){
+       switch(direccion){
          case "LEFT":
            for(int i = 0; i < 4; i++){
-              theShape[i][0]--;  
+              LaFigura[i][0]--;  
            } 
            break;
          case "RIGHT":
            for(int i = 0; i < 4; i++){
-              theShape[i][0]++;  
+              LaFigura[i][0]++;  
            }
            break;
          case "DOWN":
            for(int i = 0; i < 4; i++){
-              theShape[i][1]++;  
+              LaFigura[i][1]++;  
            }     
            break;
        }     
@@ -238,156 +273,132 @@ public class Shape{
   }
    
   void rotate(){
-    if(theShape != square){
-       int[][] rotated = new int[4][2];
-       if(rotCount % 4 == 0){
+    if(LaFigura != Cuadrado){
+       int[][] Rotar = new int[4][2];
+       if(contadorRotaciones % 4 == 0){
          for(int i = 0; i < 4; i++){
-            rotated[i][0] = oS[i][1] - theShape[1][0];
-            rotated[i][1] = -oS[i][0] - theShape[1][1];
+            Rotar[i][0] = OtraFigura[i][1] - LaFigura[1][0];
+            Rotar[i][1] = -OtraFigura[i][0] - LaFigura[1][1];
          }
-       } else if (rotCount % 4 == 1){
+       } else if (contadorRotaciones % 4 == 1){
           for(int i = 0; i < 4; i++){
-            rotated[i][0] = -oS[i][0] - theShape[1][0];
-            rotated[i][1] = -oS[i][1] - theShape[1][1];
+            Rotar[i][0] = -OtraFigura[i][0] - LaFigura[1][0];
+            Rotar[i][1] = -OtraFigura[i][1] - LaFigura[1][1];
          }
-       } else if (rotCount % 4 == 2){ 
+       } else if (contadorRotaciones % 4 == 2){ 
          for(int i = 0; i < 4; i++){
-            rotated[i][0] = -oS[i][1] - theShape[1][0];
-            rotated[i][1] = oS[i][0] - theShape[1][1];
+            Rotar[i][0] = -OtraFigura[i][1] - LaFigura[1][0];
+            Rotar[i][1] = OtraFigura[i][0] - LaFigura[1][1];
          }
-       } else if (rotCount % 4 == 3){
+       } else if (contadorRotaciones % 4 == 3){
           for(int i = 0; i < 4; i++){
-            rotated[i][0] = oS[i][0] - theShape[1][0];
-            rotated[i][1] = oS[i][1] - theShape[1][1];
+            Rotar[i][0] = OtraFigura[i][0] - LaFigura[1][0];
+            Rotar[i][1] = OtraFigura[i][1] - LaFigura[1][1];
          } 
        }
-       theShape = rotated;
+       LaFigura = Rotar;
     }
   }
 
 
-  boolean checkBack(Background b){
+  boolean Limites(Fondito b){
       for(int i = 0; i < 4; i++) {
-         theX = theShape[i][0];
-         theY = theShape[i][1];
-         if(theX >= 0 && theX < 12 && theY >= 0 && theY < 23){
+         ejeX = LaFigura[i][0];
+         ejeY = LaFigura[i][1];
+         if(ejeX >= 0 && ejeX < 12 && ejeY >= 0 && ejeY < 23){
            for(int a = 0; a < 3; a++){
-             if(b.colors[theX][theY+1][a] != 0){
+             if(b.colores[ejeX][ejeY+1][a] != 0){
                 return false;   
              }
            }
-         }//Check for OUT OF BOUNDS
-      } // Check each block
+         }
+      } 
       return true;
   }
 
-  
-  //THE FOLLOWING CODE WAS NOT ON THE TUTORIAL BUT ADDED AFTER I PUBLISHED 
-  void debugEdge(){
-    if(isTooLeft){
+  void ComprobarBordes(){
+    if(Pasa_Izquierda){
       for(int i = 0; i < 4; i++){
-          theShape[i][0]++;
+          LaFigura[i][0]++;
       }
-      isTooLeft = false;
+      Pasa_Izquierda = false;
     }
-    if(isTooRight){
+    if(Pasa_derecha){
       for(int i = 0; i < 4; i++){
-          theShape[i][0]--;
+          LaFigura[i][0]--;
       }
-      isTooRight = false;
+      Pasa_derecha = false;
     }    
   }
-  
-  //This METHOD was called in the moveDown() function
-  void checkEdges(){
+ 
+  void Comprobacion(){
     for(int i = 0; i < 4; i++){
-      if(theShape[i][0] < 0){
-        isTooLeft = true;
-        debugEdge();
-      } else if(theShape[i][0] > 11){
-        isTooRight = true;
-        debugEdge();
+      if(LaFigura[i][0] < 0){
+        Pasa_Izquierda = true;
+        ComprobarBordes();
+      } else if(LaFigura[i][0] > 11){
+        Pasa_derecha = true;
+        ComprobarBordes();
       }
     }
   }
 }
-Grid grid;
-Shape shape, onDeck;
-Background bg;
-int gameState;
 
-void setup(){
-  size(600 , 600);  
-  grid = new Grid();
-  shape = new Shape();
-  shape.isActive = true;
-  onDeck = new Shape();
-  bg = new Background();
-  textSize(44);
-  gameState = 1;
-}
 
-void draw(){
-   if(gameState == 1){
-     bg.pantalla();
-     grid.display();
-     drawShapes();
-     scoreAndLevel();
-     if(!bg.gameOn()){
-       gameState = 2;
-     }
-   }
-   if(gameState == 2){
-     fill(0);
-     text("Click Anywhere to Play Again", 30, height/2);
-     fill(255);
-     text("Click Anywhere to Play Again", 32, height/2+2);
-     if(mousePressed){
-       setup();
-     }
-   }
-     
-}
 
-void scoreAndLevel(){
+
+void Puntaje_Nivel(){
    fill(0);
-   text("Score: " + bg.score, width/2 + 100, height - 100);
+   text("Puntuación: " + Fd.puntaje, width/2 + 2, height - 15);
    fill(255);
-   text("Score: " + bg.score, width/2 + 105, height - 95); 
-   if(bg.score < 30){
-     shape.level = 31 - bg.score;
+   text("Puntuación: " + Fd.puntaje, width/2 + 7, height - 15); 
+   if(Fd.puntaje < 30){
+     figura.Nivel = 31 - Fd.puntaje;
+   if(Fd.puntaje >= 10){
+     textSize(44);
+     fill(264,0,0);
+     text("Sigue asi UwU", width/2 + 2, 320);}
+   else{
+     textSize(30);
+     fill(264,0,0);
+     text("Tu puedes UwU", width/2+2, 320);
+   if(Fd.puntaje >=30){
+     fill(0,264,0);
+     text("JP severo teacher", width/2 + 2, 320);
+   }
+   }
    }
 }
-void drawShapes(){
-   shape.pantalla();
-   onDeck.showOnDeck();
-   if(shape.checkBack(bg)){
-     shape.moveDown();
+void drawFigura(){
+   figura.pantalla();
+   Figura_presente.Mostrar_Figura_presente();
+   if(figura.Limites(Fd)){
+     figura.Abajo();
    } else {
-     shape.isActive = false;
+     figura.Activo = false;
    }
-   if(!shape.isActive){
-    bg.writeShape(shape);
-    shape = onDeck;
-    shape.isActive = true;
-    onDeck = new Shape();
+   if(!figura.Activo){
+    Fd.RealizarFigura(figura);
+    figura = Figura_presente;
+    figura.Activo = true;
+    Figura_presente = new Figura();
   } 
 
 }
 void keyPressed(){
   if(keyCode == RIGHT){
-    shape.move("RIGHT");
+    figura.C_Mueve("RIGHT");
   } else if (keyCode == LEFT){
-    shape.move("LEFT");
+    figura.C_Mueve("LEFT");
   } else if (keyCode == DOWN){
-    shape.move("DOWN");
+    figura.C_Mueve("DOWN");
   }
 }
 
 void keyReleased(){
   if(keyCode == UP){
-    shape.rotate();
-    shape.rotate();
+    figura.rotate();
+    figura.rotate();
   } 
-  shape.rotCount++;
+  figura.contadorRotaciones++;
 }
