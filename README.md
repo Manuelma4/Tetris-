@@ -4,8 +4,8 @@ Todas las sugerencias seran bien recibidas.
 
 ## Requerimientos
 
--IDE de processing.
--Java 7 o superior.
+- IDE de processing.
+- Java 7 o superior.
 
 ## Como ejecutar
 
@@ -17,7 +17,7 @@ Cuando ejecutes el programa, el juego inicia en el mismo momento, tienes que dar
 
 ## Controles del juego
 
--Bajar mas rapido: Cruzeta-abajo.
--Movimiento hacia la izquierda: Cruzeta-izquierda.
--Movimiento hacia la derecha: Cruzeta-derecha.
--Rotaciones de la figura: cruzeta-arriba.
+- Bajar mas rapido: Cruzeta-abajo.
+- Movimiento hacia la izquierda: Cruzeta-izquierda.
+- Movimiento hacia la derecha: Cruzeta-derecha.
+- Rotaciones de la figura: cruzeta-arriba.
